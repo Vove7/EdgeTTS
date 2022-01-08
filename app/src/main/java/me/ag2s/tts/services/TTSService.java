@@ -100,7 +100,7 @@ public class TTSService extends TextToSpeechService {
             callback.done();
             isSynthesizing = false;
 
-            if (sharedPreferences.getBoolean(Constants.USE_AUTO_RETRY, false)) {
+            if (sharedPreferences.getBoolean(Constants.USE_AUTO_RETRY, true)) {
                 Log.d(TAG, "AAAA:使用自动重试。");
                 TTSService.this.webSocket = getOrCreateWs();
             }

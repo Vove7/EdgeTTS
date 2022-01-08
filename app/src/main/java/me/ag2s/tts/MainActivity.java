@@ -70,7 +70,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sharedPreferences = getApplicationContext().getSharedPreferences("TTS", Context.MODE_PRIVATE);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_tts);
         Button btn_set_tts = findViewById(R.id.btn_set_tts);
         btn_IgnoringBatteryOptimizations = findViewById(R.id.btn_kill_battery);
         btn_set_tts.setOnClickListener(this);
@@ -327,6 +327,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }).start();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        textToSpeech.stop();
+    }
+
     private void downLoadAndInstall(String appName) {
         try {
             //https://cdn.staticaly.com/gh/ag2s20150909/TTS/master/release/TTS_release_v0.2_202112251858.apk
@@ -412,13 +418,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_set_tts:
-                setTTS();
-                break;
-            case R.id.btn_kill_battery:
-                killBATTERY();
-                break;
+        int id = v.getId();
+        if (id == R.id.btn_set_tts) {
+            setTTS();
+        } else if (id == R.id.btn_kill_battery) {
+            killBATTERY();
         }
     }
 

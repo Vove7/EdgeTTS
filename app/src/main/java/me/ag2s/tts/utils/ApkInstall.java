@@ -42,7 +42,7 @@ public class ApkInstall {
 
     private Uri uriFromFile(Context context, File file) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", file);
+            return FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
         } else {
             return Uri.fromFile(file);
         }

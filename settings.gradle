@@ -1,2 +1,3 @@
 rootProject.name = "TTS"
 include ':app'
+include ':example'
