@@ -23,6 +23,10 @@ public class TtsConfig {
 
     }
 
+    public TtsOutputFormat getDefaultFormat() {
+        return TtsFormatManger.getInstance().getDefaultFormat();
+    }
+
     public TtsOutputFormat getFormat() {
         return TtsFormatManger.getInstance().getFormat(index);
     }

@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.UUID;
 
 import me.ag2s.tts.APP;
 import me.ag2s.tts.utils.ByteArrayMediaDataSource;
@@ -67,8 +68,6 @@ public class TTSService extends TextToSpeechService {
         super.onCreate();
         client = APP.getOkHttpClient();
         sharedPreferences = getApplicationContext().getSharedPreferences("TTS", Context.MODE_PRIVATE);
-
-
     }
 
     @Override
@@ -122,19 +121,14 @@ public class TTSService extends TextToSpeechService {
             }
             //生成结束
             if (endIndex != -1) {
-
                 if (callback != null && !callback.hasFinished()) {
                     if (!currentFormat.needDecode) {
                         callback.done();
                         isSynthesizing = false;
                     } else {
                         doDecode(callback, currentFormat, mData.readByteString());
-
                     }
-
                 }
-
-
             }
         }
 
@@ -160,8 +154,6 @@ public class TTSService extends TextToSpeechService {
                             Log.d(TAG, "移除WAV文件头");
                         }
                         doUnDecode(callback, currentFormat, bytes.substring(audioIndex));
-
-
                     } else {
                         mData.write(bytes.substring(audioIndex));
                     }
@@ -329,6 +321,7 @@ public class TTSService extends TextToSpeechService {
         int offset = 0;
         while (offset < length) {
             int bytesToWrite = Math.min(maxBufferSize, length - offset);
+            Log.d(TAG, "cb.audioAvailable " + bytesToWrite);
             cb.audioAvailable(data.toByteArray(), offset, bytesToWrite);
             offset += bytesToWrite;
         }
@@ -350,15 +343,16 @@ public class TTSService extends TextToSpeechService {
             if (isSuccess) {
                 return this.webSocket;
             }
-
         }
+
+        String conId = UUID.randomUUID().toString().replace("-", "").toLowerCase();
         Request request = new Request.Builder()
-                .url(Constants.EDGE_URL)
+                .url(Constants.EDGE_URL + "&ConnectionId=" + conId)
                 .header("User-Agent", Constants.EDGE_UA)
                 .addHeader("Origin", Constants.EDGE_ORIGIN)
                 .build();
         this.webSocket = client.newWebSocket(request, webSocketListener);
-        sendConfig(this.webSocket, new TtsConfig.Builder(sharedPreferences.getInt(Constants.AUDIO_FORMAT_INDEX, 0)).sentenceBoundaryEnabled(true).build());
+        sendConfig(this.webSocket, new TtsConfig.Builder(sharedPreferences.getInt(Constants.AUDIO_FORMAT_INDEX, -1)).sentenceBoundaryEnabled(true).build());
         return webSocket;
     }
     //发送合成语音配置
@@ -390,7 +384,7 @@ public class TTSService extends TextToSpeechService {
      */
     public void sendText(SynthesisRequest request, SynthesisCallback callback) {
         //设置发送的音质
-        int index = sharedPreferences.getInt(Constants.AUDIO_FORMAT_INDEX, 0);
+        int index = sharedPreferences.getInt(Constants.AUDIO_FORMAT_INDEX, -1);
         TtsConfig ttsConfig = new TtsConfig.Builder(index).build();
         TtsOutputFormat format = ttsConfig.getFormat();
         currentFormat = format;
@@ -400,8 +394,8 @@ public class TTSService extends TextToSpeechService {
 
         StringBuilder sb = new StringBuilder(request.getCharSequenceText());
         Log.d(TAG, "源：" + sb);
-        CommonTool.replaceAll(sb,">","");
-        CommonTool.replaceAll(sb,"<","");
+        CommonTool.replaceAll(sb, ">", "");
+        CommonTool.replaceAll(sb, "<", "");
         //移除空格
         CommonTool.Trim(sb);
         //判断是否全是不发声字符，如果是，直接跳过
@@ -421,7 +415,7 @@ public class TTSService extends TextToSpeechService {
 
         int pitch = request.getPitch() - 100;
         int rate = request.getSpeechRate() - 100;
-        //Log.e(TAG, "速度" + rate);
+        Log.e(TAG, "速度: " + rate +", pitch: " + pitch);
 
         int volume = sharedPreferences.getInt(Constants.VOICE_VOLUME, 100);
 

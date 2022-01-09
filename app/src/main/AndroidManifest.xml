@@ -52,22 +52,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:label="TTS Settings">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-            <intent-filter>
-                <action android:name="android.speech.tts.engine.CONFIGURE_ENGINE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name=".TtsSettingsActivity"
+            android:theme="@style/Theme.MaterialComponents.Light"
             android:exported="true">
 
             <intent-filter>

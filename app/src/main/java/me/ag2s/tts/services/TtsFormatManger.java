@@ -73,9 +73,13 @@ public class TtsFormatManger {
         return formats.size();
     }
 
+    public TtsOutputFormat getDefaultFormat() {
+        return new TtsOutputFormat("audio-24khz-48kbitrate-mono-mp3", 24000, AudioFormat.ENCODING_PCM_16BIT, true);
+    }
+    
     public TtsOutputFormat getFormat(int index) {
         if (index > formats.size() - 1 || index < 0) {
-            return formats.get(0);
+            return getDefaultFormat();
         }
         return formats.get(index);
     }
